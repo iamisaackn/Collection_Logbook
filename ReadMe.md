@@ -1,41 +1,127 @@
-## Pivot: **BFSI Analyst Scratchpad / Trade Blotter Notes**
+# Collection Logbook Automation (MVP)
 
-Rebrand and extend it into something a **financial analyst or trader** would actually use day-to-day.
+The application sits **alongside the existing loan system**. It doesn't replace it.
 
----
+Instead, it helps collection officers record customer interactions in a structured way and automatically organize their daily work.
 
-### What you change
+## Step 1: Display Existing Loan Information
 
-**Rename & Rebrand**
-- "Note App" → **"Analyst Desk — Trade & Observation Log"**
-- Each note becomes a **timestamped analyst observation** (e.g. *"EQTY portfolio — client X flagged for review, DPD crossed 90 days"*)
+The application reads customer information from the existing database.
 
-**Add these features (still pure JS, no backend needed):**
+It mainly uses:
 
-| Feature | BFSI Angle |
-|---|---|
-| Auto-timestamp each note | Audit trail — critical in BFSI |
-| Note categories/tags | `#credit-risk`, `#fraud-alert`, `#client-review` |
-| Priority flag (color-coded) | High / Medium / Low — like escalation tiers |
-| Search/filter notes | Analyst searching past observations |
-| Export notes as `.txt` or `.csv` | Mimics MIS report generation |
+* `loan_application` – Loan details (customer, balance, loan status, loan number)
+* `user` – Collection officer information
+* `branch` – Branch details
+* `loan_product` – Loan product
+* `loan_payment` – Latest payment information (optional)
+
+No data is changed in these tables—they are only read.
 
 ---
 
-### Why this works for your portfolio
+## Step 2: Officer Opens a Customer
 
-- Shows you understand **BFSI workflows** (audit trails, escalation, MIS)
-- The **CSV export** feature signals data handoff thinking — a very DA skill
-- It's still simple enough to build solo but purposeful enough to explain in an interview
+Instead of searching through Excel or writing notes in Notepad, the officer opens a customer record.
+
+The application automatically displays:
+
+* Customer Name
+* Loan Number
+* Outstanding Balance
+* Days Past Due
+* Branch
+* Product
+* Last Payment
 
 ---
 
-### What to say in interviews
+## Step 3: Officer Completes a Form
 
-> *"I built a lightweight analyst logging tool that mimics how credit analysts track daily observations — with timestamps, tagging by risk category, and CSV export for MIS reporting."*
+After calling the customer, the officer fills in a simple form.
 
-That's a completely different conversation than *"I built a note app."*
+Example:
+
+* Call Outcome
+* Promise to Pay Date
+* Follow-up Date
+* Comments
+* Status (Open / Closed)
+
+This takes less than a minute.
 
 ---
 
-Keep it, rename it, add 2-3 of those features and it becomes a legitimate portfolio piece.
+## Step 4: Save the Collection Note
+
+When the officer clicks **Save**, the system automatically:
+
+* Records the current date and time
+* Records which officer created the note
+* Links the note to the correct loan
+* Schedules the next follow-up
+* Makes the note available to supervisors
+
+This information is stored in **one new table**, for example:
+
+`collection_case_note`
+
+This keeps the existing loan database unchanged.
+
+---
+
+## Step 5: Daily Dashboard
+
+When officers log in the next morning, the application automatically shows:
+
+* Customers to call today
+* Promise-to-Pay cases due today
+* Overdue follow-ups
+* Completed follow-ups
+
+The officer no longer needs reminders in Excel or sticky notes.
+
+---
+
+## Step 6: Management Reports
+
+Managers can instantly view:
+
+* Calls made today
+* Calls by officer
+* Calls by branch
+* Promise-to-Pay cases
+* Overdue follow-ups
+
+They can also export the information to CSV for MIS reporting.
+
+---
+
+# Technology Roles
+
+**SQL**
+
+* Reads loan information from the existing database.
+* Stores collection notes.
+* Produces reports.
+
+**Python**
+
+* Automates repetitive tasks such as timestamps, follow-up scheduling, dashboard updates, reminders, and CSV exports.
+
+**R**
+
+* Creates weekly and monthly management reports with charts showing collection performance, officer productivity, and follow-up trends.
+
+---
+
+## Database Tables Used
+
+| Purpose                           | Table                  |
+| --------------------------------- | ---------------------- |
+| Loan information                  | `loan_application`    |
+| Collection officer                | `user`               |
+| Branch                            | `branch`             |
+| Loan product                      | `loan_product`       |
+| Payment history (optional)        | `loan_payment`       |
+| **New table for the application** | `collection_case_note` |
